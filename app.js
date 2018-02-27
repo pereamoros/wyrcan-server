@@ -1,27 +1,54 @@
-var express = require('express')
-var logger = require('morgan')
-var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
-// require cors
+const express = require('express')
+const logger = require('morgan')
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const session = require('express-session')
+const MongoStore = require('connect-mongo')(session)
 
-var index = require('./routes/index')
-var users = require('./routes/users')
+const index = require('./routes/index')
 
-var app = express()
+const app = express()
 
 // DB Setup
-
-// Session
+mongoose.Promise = Promise
+mongoose.connect('mongodb://localhost/wyrcan', {
+  keepAlive: true,
+  reconnectTries: Number.MAX_VALUE
+})
 
 // Middlewares
+app.use(cors({
+  credentials: true,
+  origin: ['http://localhost:4200']
+}))
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
+// Session
+app.use(session({
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 24 * 60 * 60 // 1 day
+  }),
+  secret: 'some-string',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}))
+
+app.use(function (req, res, next) {
+  app.locals.user = req.session.currentUser
+  next()
+})
+
 // Routes
 app.use('/', index)
-app.use('/users', users)
 
 // Error handlers
 app.use((req, res, next) => {
