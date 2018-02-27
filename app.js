@@ -1,13 +1,14 @@
+const cors = require('cors')
 const express = require('express')
 const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
-const cors = require('cors')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 
 const index = require('./routes/index')
+const auth = require('./routes/auth')
 
 const app = express()
 
@@ -42,13 +43,14 @@ app.use(session({
   }
 }))
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   app.locals.user = req.session.currentUser
   next()
 })
 
 // Routes
 app.use('/', index)
+app.use('/auth', auth)
 
 // Error handlers
 app.use((req, res, next) => {
