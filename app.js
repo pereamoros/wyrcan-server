@@ -9,6 +9,7 @@ const MongoStore = require('connect-mongo')(session)
 
 const index = require('./routes/index')
 const auth = require('./routes/auth')
+const jobs = require('./routes/jobs')
 
 const app = express()
 
@@ -51,6 +52,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/', index)
 app.use('/auth', auth)
+app.use('/jobs', jobs)
 
 // Error handlers
 app.use((req, res, next) => {
