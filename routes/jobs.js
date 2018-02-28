@@ -3,6 +3,14 @@ const router = express.Router()
 
 const Job = require('../models/jobs')
 
+router.get('/my-jobs', (req, res, next) => {
+  Job.find({})
+    .then((jobs) => {
+      res.json(jobs)
+    })
+    .catch(next)
+})
+
 router.post('/create', (req, res, next) => {
   const position = req.body.position
   const description = req.body.description
