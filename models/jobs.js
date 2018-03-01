@@ -1,8 +1,8 @@
-'use strict'
+'use strict';
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const ObjectId = mongoose.Schema.Types.ObjectId
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const jobSchema = new Schema({
   position: String,
@@ -18,8 +18,8 @@ const jobSchema = new Schema({
     },
     text: String
   }]
-})
+});
 
-const Job = mongoose.model('Job', jobSchema)
+const Job = mongoose.model('Job', jobSchema);
 
-module.exports = Job
+module.exports = Job;
