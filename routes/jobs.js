@@ -11,6 +11,18 @@ router.get('/my-jobs', (req, res, next) => {
     .catch(next);
 });
 
+router.get('/:id', (req, res, next) => {
+  const jobId = req.params.id;
+  Job.findById(jobId)
+    .then((job) => {
+      if (!job) {
+        return res.status(404).json(new Error('404'));
+      }
+      return res.json(job);
+    })
+    .catch(next);
+});
+
 router.post('/create', (req, res, next) => {
   const position = req.body.position;
   const description = req.body.description;
