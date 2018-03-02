@@ -22,6 +22,7 @@ router.get('/my-jobs', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const jobId = req.params.id;
   Job.findById(jobId)
+    .populate('applications.user')
     .then((job) => {
       if (!job) {
         return res.status(404).json(new Error('404'));
@@ -42,6 +43,23 @@ router.post('/create', (req, res, next) => {
   return newJob.save()
     .then(() => {
       res.json(newJob);
+    })
+    .catch(next);
+});
+
+router.post('/:id/apply', (req, res, next) => {
+  const applicant = req.session.currentUser._id;
+  const jobId = req.params.id;
+  const updates = {
+    $addToSet: {
+      applications: [{
+        user: applicant
+      }]
+    }
+  };
+  return Job.update({_id: jobId}, updates)
+    .then(() => {
+      res.json(Job);
     })
     .catch(next);
 });
