@@ -51,13 +51,14 @@ router.post('/:id/apply', (req, res, next) => {
   const applicant = req.session.currentUser._id;
   const jobId = req.params.id;
   const updates = {
-    $addToSet: {
-      applications: [{
+    $push: {
+      applications: {
         user: applicant
-      }]
+      }
     }
   };
-  return Job.update({_id: jobId}, updates)
+
+  return Job.update({_id: jobId, 'applications.user': {$ne: applicant}}, updates)
     .then(() => {
       res.json(Job);
     })
