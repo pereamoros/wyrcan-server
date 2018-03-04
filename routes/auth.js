@@ -82,4 +82,16 @@ router.post('/logout', (req, res) => {
   return res.status(204).send();
 });
 
+router.get('/profile/:id', (req, res, next) => {
+  const userId = req.params.id;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json(new Error('404'));
+      }
+      return res.json(user);
+    })
+    .catch(next);
+});
+
 module.exports = router;
