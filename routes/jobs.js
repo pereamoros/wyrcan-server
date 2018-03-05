@@ -22,6 +22,7 @@ router.get('/my-jobs', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const jobId = req.params.id;
   Job.findById(jobId)
+    .populate('owner')
     .populate('applications.user')
     .then((job) => {
       if (!job) {
