@@ -103,4 +103,13 @@ router.post('/:id/unarchive', (req, res, next) => {
     .catch(next);
 });
 
+router.post('/:id/delete', (req, res, next) => {
+  const jobId = req.params.id;
+  return Job.deleteOne({_id: jobId})
+    .then(() => {
+      res.json(Job);
+    })
+    .catch(next);
+});
+
 module.exports = router;
