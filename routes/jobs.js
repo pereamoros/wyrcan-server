@@ -19,6 +19,14 @@ router.get('/my-jobs', (req, res, next) => {
     .catch(next);
 });
 
+router.get('/archived', (req, res, next) => {
+  Job.find({$and: [{owner: req.session.currentUser._id}, {archive: true}]})
+    .then((result) => {
+      res.json(result);
+    })
+    .catch(next);
+});
+
 router.get('/:id', (req, res, next) => {
   const jobId = req.params.id;
   Job.findById(jobId)
