@@ -89,4 +89,18 @@ router.post('/:id/archive', (req, res, next) => {
     .catch(next);
 });
 
+router.post('/:id/unarchive', (req, res, next) => {
+  const jobId = req.params.id;
+  const updates = {
+    $set: {
+      archive: false
+    }
+  };
+  return Job.update({_id: jobId}, updates)
+    .then(() => {
+      res.json(Job);
+    })
+    .catch(next);
+});
+
 module.exports = router;
