@@ -4,7 +4,7 @@ const router = express.Router();
 const Job = require('../models/jobs');
 
 router.get('/jobs', (req, res, next) => {
-  Job.find()
+  Job.find({archive: false})
     .then((jobs) => {
       res.json(jobs);
     })
@@ -12,7 +12,7 @@ router.get('/jobs', (req, res, next) => {
 });
 
 router.get('/my-jobs', (req, res, next) => {
-  Job.find({owner: req.session.currentUser._id})
+  Job.find({$and: [{owner: req.session.currentUser._id}, {archive: false}]})
     .then((jobs) => {
       res.json(jobs);
     })
@@ -39,7 +39,8 @@ router.post('/create', (req, res, next) => {
   const newJob = new Job({
     position,
     description,
-    owner: req.session.currentUser._id
+    owner: req.session.currentUser._id,
+    archive: false
   });
   return newJob.save()
     .then(() => {
@@ -60,6 +61,20 @@ router.post('/:id/apply', (req, res, next) => {
   };
 
   return Job.update({_id: jobId, 'applications.user': {$ne: applicant}}, updates)
+    .then(() => {
+      res.json(Job);
+    })
+    .catch(next);
+});
+
+router.post('/:id/archive', (req, res, next) => {
+  const jobId = req.params.id;
+  const updates = {
+    $set: {
+      archive: true
+    }
+  };
+  return Job.update({_id: jobId}, updates)
     .then(() => {
       res.json(Job);
     })
