@@ -94,4 +94,24 @@ router.get('/profile/:id', (req, res, next) => {
     .catch(next);
 });
 
+router.post('/edit/:id', (req, res, next) => {
+  const userId = req.params.id;
+  User.findById(userId)
+    .then((result) => {
+      let newDescription = '';
+      if (req.body.description === undefined) {
+        newDescription = result.description;
+      } else {
+        newDescription = req.body.description;
+      }
+      const data = {
+        description: newDescription
+      };
+      result.update(data)
+        .then((user) => {
+          return res.json(user);
+        }).catch(next);
+    });
+});
+
 module.exports = router;
