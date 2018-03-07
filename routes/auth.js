@@ -98,18 +98,13 @@ router.post('/edit/:id', (req, res, next) => {
   const userId = req.params.id;
   User.findById(userId)
     .then((result) => {
-      let newDescription = '';
-      if (req.body.description === undefined) {
-        newDescription = result.description;
-      } else {
-        newDescription = req.body.description;
+      if (req.body.description !== undefined) {
+        result.description = req.body.description;
       }
-      const data = {
-        description: newDescription
-      };
-      result.update(data)
-        .then((user) => {
-          return res.json(user);
+      result.save()
+        .then(() => {
+          req.session.currentUser = result;
+          return res.json(result);
         }).catch(next);
     });
 });

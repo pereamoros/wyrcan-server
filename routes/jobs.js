@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Job = require('../models/jobs');
+const User = require('../models/user');
 
 router.get('/jobs', (req, res, next) => {
   Job.find({archive: false})
@@ -23,6 +24,16 @@ router.get('/archived', (req, res, next) => {
   Job.find({$and: [{owner: req.session.currentUser._id}, {archive: true}]})
     .then((result) => {
       res.json(result);
+    })
+    .catch(next);
+});
+
+router.get('/applied', (req, res, next) => {
+  const currentUser = req.session.currentUser._id;
+  User.findById(currentUser)
+    .populate('appliedJobs.job')
+    .then((user) => {
+      res.json(user);
     })
     .catch(next);
 });
@@ -67,10 +78,21 @@ router.post('/:id/apply', (req, res, next) => {
       }
     }
   };
+  const updateApply = {
+    $push: {
+      appliedJobs: {
+        job: jobId
+      }
+    }
+  };
 
-  return Job.update({_id: jobId, 'applications.user': {$ne: applicant}}, updates)
-    .then(() => {
-      res.json(Job);
+  return User.update({_id: applicant, 'appliedJobs.job': {$ne: jobId}}, updateApply)
+    .then((user) => {
+      Job.update({_id: jobId, 'applications.user': {$ne: applicant}}, updates)
+        .then(() => {
+          res.json(Job);
+        })
+        .catch(next);
     })
     .catch(next);
 });
