@@ -134,4 +134,38 @@ router.post('/:id/delete', (req, res, next) => {
     .catch(next);
 });
 
+router.post('/:id/candidate/:userId/accept', (req, res, next) => {
+  const jobId = req.params.id;
+  const userId = req.params.userId;
+  const updateApply = {
+    $set: {
+      'appliedJobs.$.status': 'accepted'
+    }
+  };
+
+  return User.update({_id: userId, 'appliedJobs.job': jobId}, updateApply)
+    .then((response) => {
+      console.log(response);
+      res.json(User);
+    })
+    .catch(next);
+});
+
+router.post('/:id/candidate/:userId/reject', (req, res, next) => {
+  const jobId = req.params.id;
+  const userId = req.params.userId;
+  const updateApply = {
+    $set: {
+      'appliedJobs.$.status': 'rejected'
+    }
+  };
+
+  return User.update({_id: userId, 'appliedJobs.job': jobId}, updateApply)
+    .then((response) => {
+      console.log(response);
+      res.json(User);
+    })
+    .catch(next);
+});
+
 module.exports = router;
